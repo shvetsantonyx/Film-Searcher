@@ -90,6 +90,17 @@ class App(Tk):
         self.scroll_text.pack(side=RIGHT, fill=Y)
         self.text_area.config(yscrollcommand=self.scroll_text.set)
 
+        # self.m = Message(self, text='111123')
+        # self.m.place(x=10, y=20)
+
+    def message_search(self):
+        self.top = Toplevel()
+        self.m = Message(self.top, text='Подождите, выполняется поиск...', relief = RAISED)
+        self.m.place(x=100, y=20)
+        if self.searcher_obj.marker == True:
+            self.top.destroy()
+       
+
     # this func calls after button 'ПОИСК' is clicked
     def make_film_btns(self):
 

@@ -4,6 +4,7 @@ from kinopoisk_api import KP
 import os.path
 import os
 import pytils.translit
+import threading
 
 
 class Searcher:
@@ -22,23 +23,51 @@ class Searcher:
         tkinter.entry.delete(0, END)
         tkinter.entry.insert(0, direction_main_path)
 
+    def message_search(self):
+        self.top = Toplevel(height=80, width=200)
+        self.m = Message(self.top, text='Подождите. Выполняется поиск...')
+        self.m.place(x=60, y=13)
+        # self.m.pack()
+
+    def check_thread(self,tkinter, thread):
+            if thread.is_alive():
+                tkinter.after(100, lambda: self.check_thread(tkinter, thread))
+            else:
+                tkinter.button_search.config(state=NORMAL)
+
     # button 'ПОИСК' logic
     def btn_search(self, tkinter):
         # get path from entry
         entry_path = tkinter.entry.get()
 
         try:
-            dir_list = os.listdir(entry_path)
+            self.dir_list = os.listdir(entry_path)
 
         except FileNotFoundError:
             messagebox.showwarning('Warning', 'Выберите путь')
             self.btn_get_path(tkinter)
 
+
+        tkinter.button_search.config(state=DISABLED)
+
+        thread = threading.Thread(target=lambda: self.logic(tkinter))
+        print(threading.main_thread().name)
+        print(thread.name)
+        thread.start()
+        self.check_thread(tkinter, thread)
+
+        
+
+        # self.message_search()
+    def logic(self, tkinter):
+        
         film_list = []
         # sorting dir_list by video format extensions and filling film_list
-        for file in dir_list:
+        for file in self.dir_list:
             if '.mkv' in file or '.avi' in file or '.mp4' in file or '.mpg' in file or '.mov' in file or '.mpeg4' in file or '.flv' in file or '.vob' in file or '.wmv' in file:
                 film_list.append(file)
+
+        self.message_search()
 
         # return films in format: filmname_year
         def text_reader(text):
@@ -63,6 +92,8 @@ class Searcher:
             formated_str = string_1.replace('.', ' ').replace('(', '').replace(')', '').replace('_', ' ').replace('[', '').replace(']', '')
             return formated_str
 
+        
+
         self.film_list_form = []
         # filling film_list_form with films
         for string in film_list:
@@ -77,6 +108,7 @@ class Searcher:
         kinopoisk = KP(token='34c5c2a6-5e2e-4005-aba5-575c848fe1a7')
 
         # working with KinopoiskAPI
+        # @task
         def searchKP(film):
             search = kinopoisk.search(film)
             string_search = ''
@@ -101,6 +133,10 @@ class Searcher:
             else:
                 return string_search_formated_1
 
+        
+        # self.m = Message(tkinter, text='111123', relief = RAISED)
+        # self.m.place(x=100, y=20)
+
         # list of answers for films from KinopoiskAPI
         total_answer = []
         # call searchKP and fill total_answer
@@ -112,6 +148,7 @@ class Searcher:
         self.dict_films = dict(zip(self.film_list_form, total_answer))
         # turn on function than create buttons from self.dict_film
         tkinter.make_film_btns()
+        self.top.destroy()
         messagebox.showinfo('Info', 'Поиск выполнен!')
 
     # film buttons operation
