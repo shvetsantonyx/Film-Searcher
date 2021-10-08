@@ -22,6 +22,8 @@ search = kinopoisk.search('Delicieux 2021')
 #print(search)
 string_search = ''
 
+films = ['Green Mile', 'Терминатор']
+
 
 for item in search:
     # print(item.ru_name, item.year, item.kp_rate)
@@ -35,3 +37,5 @@ if len(string_search) < 5:
 else:
     print('ok')
     # print(", ".join(item.countries))
+
+

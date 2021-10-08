@@ -6,7 +6,12 @@ from kinopoisk_api import KP
 kinopoisk = KP(token='34c5c2a6-5e2e-4005-aba5-575c848fe1a7')
 
 
-dir_list = os.listdir(r'C:\Users\SAI\Python_Scr\Kinopoisk\KinoPoiskAPI\test')
+dir_list = os.listdir(r'C:\Users\SAI\Python_Scr\Film-Searcher\test_4')
+dir_dir = os.walk(r'C:\Users\SAI\Python_Scr\Film-Searcher\test_4')
+print(type(dir_dir))
+
+for i in dir_dir:
+    print(i)
 
 print(dir_list)
 
@@ -17,7 +22,7 @@ for file in dir_list:
     # if file in ('.mkv', '.avi', '.mp4', 'mpg', '.mov', 'mpeg4', '.flv', '.vob', '.wmv'):
         film_list.append(file)
 
-print(film_list)
+# print(film_list)
 
 
 
