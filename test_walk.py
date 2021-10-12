@@ -10,10 +10,13 @@ dir_list = os.listdir(r'C:\Users\SAI\Python_Scr\Film-Searcher\test_4')
 dir_dir = os.walk(r'C:\Users\SAI\Python_Scr\Film-Searcher\test_4')
 print(type(dir_dir))
 
-for i in dir_dir:
-    # print(i)
-    film_list_not_ready = i
-    break
+# for i in dir_dir:
+#     # print(i)
+#     film_list_not_ready = i
+#     print(i)
+#     break
+
+film_list_not_ready = next(dir_dir)
 
 print(film_list_not_ready)
 

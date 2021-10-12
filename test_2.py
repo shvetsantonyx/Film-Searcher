@@ -50,7 +50,7 @@ def search(film):
         print(string_search)
         print(threading.current_thread())
         # print(threads[-1].name)
-        total_answ +=string_search
+        total_answ += string_search
     if len(string_search) < 5:
         print('none')
     else:
@@ -63,9 +63,9 @@ def search(film):
     # return string_search
 
 threads = []
-answers = []
 
-for film in films:
+
+for film in films_dict:
     # thread = threading.Thread(target=lambda x=film: search(x))
     threads.append(threading.Thread(target=lambda x=film: search(x)))
     threads[-1].start()

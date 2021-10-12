@@ -8,48 +8,70 @@ import threading
 
 
 class Searcher:
-    '''Class working with KinopoiskAPI
+    '''Class working with KinopoiskAPI.
     '''
 
-    def __init__(self):
-        # finnaly created for App (Film searcher)
-        self.dict_films = {}
-
-    # button "choose directory" logic
     def btn_get_path(self, tkinter):
-        
+        '''Button "choose directory" logic.'''
         direction_main_path = filedialog.askdirectory()            
         
         tkinter.entry.delete(0, END)
         tkinter.entry.insert(0, direction_main_path)
 
-    def message_search(self):
-        self.top = Toplevel(height=80, width=200)
+    def message_search(self, tkinter):
+        '''Message for button "ПОИСК."'''
+        self.top = Toplevel(tkinter, height=80, width=200)
+        self.top.eval('tk::PlaceWindow . center')
         self.m = Message(self.top, text='Подождите. Выполняется поиск...')
-        self.m.place(x=60, y=13)
+        # self.m.place(x=60, y=13)
         # self.m.pack()
+        # self.m.eval('tk::PlaceWindow . center')
 
-    def check_thread(self,tkinter, thread):
-            if thread.is_alive():
-                tkinter.after(100, lambda: self.check_thread(tkinter, thread))
-            else:
-                tkinter.button_search.config(state=NORMAL)
+    def check_thread(self, tkinter, thread):
+        '''Return buttons "ПОИСК", "Выбрать путь" to NORMAL state.'''
+        if thread.is_alive():
+            tkinter.after(100, lambda: self.check_thread(tkinter, thread))
+        else:
+            tkinter.button_search.config(state=NORMAL)
+            tkinter.button_path.config(state=NORMAL)
 
-    # button 'ПОИСК' logic
     def btn_search(self, tkinter):
+        '''Button 'ПОИСК' logic.'''
         # get path from entry
         entry_path = tkinter.entry.get()
 
         try:
-            self.dir_list = os.listdir(entry_path)
+            dir_generator = os.walk(entry_path)
+            # get list of files in generator
+            film_list_not_ready = next(dir_generator)
+
+            # fill with films
+            self.film_list_ready = []
+            # len > 2 is that root directory have subfolders and files 
+            if len(film_list_not_ready) > 2:
+                for file in film_list_not_ready[1]:
+                    self.film_list_ready.append(file)
+                for file in film_list_not_ready[2]:
+                    # checkout for video formats
+                    if '.mkv' in file or '.avi' in file or '.mp4' in file or '.mpg' in file or '.mov' in file or '.mpeg4' in file or '.flv' in file or '.vob' in file or '.wmv' in file:
+                        self.film_list_ready.append(file)
+
+            # len < 2 is that root directory have only files
+            else:
+                for file in film_list_not_ready:
+                    # checkout for video formats
+                    if '.mkv' in file or '.avi' in file or '.mp4' in file or '.mpg' in file or '.mov' in file or '.mpeg4' in file or '.flv' in file or '.vob' in file or '.wmv' in file:
+                        self.film_list_ready.append(file)
 
         except FileNotFoundError:
             messagebox.showwarning('Warning', 'Выберите путь')
             self.btn_get_path(tkinter)
 
-
+        # disable buttons "ПОИСК", "Выбрать путь" for searching operations
         tkinter.button_search.config(state=DISABLED)
+        tkinter.button_path.config(state=DISABLED)
 
+        # starting function "logic" in other thread
         thread = threading.Thread(target=lambda: self.logic(tkinter))
         print(threading.main_thread().name)
         print(thread.name)
@@ -57,59 +79,55 @@ class Searcher:
         self.check_thread(tkinter, thread)
 
         
-
-        # self.message_search()
     def logic(self, tkinter):
-        
-        film_list = []
-        # sorting dir_list by video format extensions and filling film_list
-        for file in self.dir_list:
-            if '.mkv' in file or '.avi' in file or '.mp4' in file or '.mpg' in file or '.mov' in file or '.mpeg4' in file or '.flv' in file or '.vob' in file or '.wmv' in file:
-                film_list.append(file)
-
-        self.message_search()
+        '''Search logic.'''
+        # call message
+        self.message_search(tkinter)
 
         # return films in format: filmname_year
         def text_reader(text):
-            string_1 = ''
-            num_str = ''
+            text_string = ''
+            num_string = ''
             for i in text:    
                 if i.isnumeric() == True:
                     # variable for counting digits in string
-                    num_str += i
-                    string_1 += i
+                    num_string += i
+                    text_string += i
                     # when num_str == 4 it is a year of a film, breaking cycle
-                    if len(num_str) == 4 and num_str.startswith('20') or len(num_str) == 4 and num_str.startswith('19'):
+                    if len(num_string) == 4 and num_string.startswith('20') or len(num_string) == 4 and num_string.startswith('19'):
                         break
                 # means that digits before not a year
-                elif i.isnumeric() == False and len(num_str) > 0:
-                    num_str = ''
-                    string_1 += i
+                elif i.isnumeric() == False and len(num_string) > 0:
+                    num_string = ''
+                    text_string += i
 
                 else:
-                    string_1 += i
-
-            formated_str = string_1.replace('.', ' ').replace('(', '').replace(')', '').replace('_', ' ').replace('[', '').replace(']', '')
-            return formated_str
+                    text_string += i
+            # replace unnessesary symbols
+            formated_string = text_string.replace('.', ' ').replace('(', '').replace(')', '').replace('_', ' ').replace('[', '').replace(']', '')
+            return formated_string
 
         
+        self.film_list_ready_formated = []
+        # filling film_list_ready_formated with films
+        for string in self.film_list_ready:
+            self.film_list_ready_formated.append(text_reader(string))
 
-        self.film_list_form = []
-        # filling film_list_form with films
-        for string in film_list:
-            self.film_list_form.append(text_reader(string))
-
+        # create dictionary of films with None values
+        self.films_dict = {}
+        for film in self.film_list_ready_formated:
+            self.films_dict[film] = None
 
         def detranslify(text):
+            '''Detranslify text.'''
             detrans_text = pytils.translit.detranslify(text)
             return detrans_text
 
         # TOKEN
         kinopoisk = KP(token='34c5c2a6-5e2e-4005-aba5-575c848fe1a7')
 
-        # working with KinopoiskAPI
-        # @task
         def searchKP(film):
+            '''Working with KinopoiskAPI.'''
             search = kinopoisk.search(film)
             string_search = ''
             # fill string_search
@@ -127,40 +145,47 @@ class Searcher:
                     string_search_formated_2 = string_search_2.replace('null', '0.0')
                 # if normal and detranslify requests have no data
                 if len(string_search) < 5:
-                    return 'Нет результата поиска'
+                    # return 'Нет результата поиска'
+                    self.films_dict[film] = 'Нет результата поиска'
                 else:
-                    return string_search_formated_2
+                    # return string_search_formated_2
+                    self.films_dict[film] = string_search_formated_2
             else:
-                return string_search_formated_1
+                # return string_search_formated_1
+                self.films_dict[film] = string_search_formated_1
 
+
+        # list of threads for searchKP
+        threads = []
         
-        # self.m = Message(tkinter, text='111123', relief = RAISED)
-        # self.m.place(x=100, y=20)
+        # call searchKP in multythreads mode
+        for film in self.films_dict:
+            threads.append(threading.Thread(target=lambda x=film: searchKP(x)))
+            threads[-1].start()
 
-        # list of answers for films from KinopoiskAPI
-        total_answer = []
-        # call searchKP and fill total_answer
-        for film in self.film_list_form:
-            answer = searchKP(film)
-            total_answer.append(answer)
+        # waiting for threads are gone
+        for thread in threads:
+            thread.join()
 
-        # create dictionary of films
-        self.dict_films = dict(zip(self.film_list_form, total_answer))
-        # turn on function than create buttons from self.dict_film
+        # turn on function than create buttons from self.films_dict
         tkinter.make_film_btns()
+
+        # close message automatically
         self.top.destroy()
         messagebox.showinfo('Info', 'Поиск выполнен!')
+        
 
-    # film buttons operation
     def btn_films(self, tkinter, key):
+        '''Film buttons operations.'''
 
-        text_for_area = self.dict_films[key]
+        text_for_area = self.films_dict[key]
 
+        # put the text to text_area
         tkinter.text_area.delete('1.0', END)
         tkinter.text_area.insert('1.0', text_for_area)
 
         # reset bg color of buttons to default
-        btn_index = self.film_list_form.index(key)
+        btn_index = self.film_list_ready_formated.index(key)
         
         for button in (tkinter.buttons[:btn_index] + tkinter.buttons[btn_index:]):
             button.config(bg='SystemButtonFace')

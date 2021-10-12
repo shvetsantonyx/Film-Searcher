@@ -89,16 +89,6 @@ class App(Tk):
         self.scroll_text = Scrollbar(self.text_frame, command=self.text_area.yview)
         self.scroll_text.pack(side=RIGHT, fill=Y)
         self.text_area.config(yscrollcommand=self.scroll_text.set)
-
-        # self.m = Message(self, text='111123')
-        # self.m.place(x=10, y=20)
-
-    def message_search(self):
-        self.top = Toplevel()
-        self.m = Message(self.top, text='Подождите, выполняется поиск...', relief = RAISED)
-        self.m.place(x=100, y=20)
-        if self.searcher_obj.marker == True:
-            self.top.destroy()
        
 
     # this func calls after button 'ПОИСК' is clicked
@@ -109,7 +99,7 @@ class App(Tk):
 
         self.buttons = []
         
-        for key in self.searcher_obj.dict_films:
+        for key in self.searcher_obj.films_dict:
             button = Button(self.frame.interior, text=key, width=55, command=lambda x=key: self.searcher_obj.btn_films(self, x))
             self.buttons.append(button)
             button.pack(fill=X)     
@@ -117,4 +107,5 @@ class App(Tk):
 
 if __name__ == '__main__':
     root = App()
+    root.eval('tk::PlaceWindow . center')
     root.mainloop()
