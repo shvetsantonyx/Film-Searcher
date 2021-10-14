@@ -36,14 +36,6 @@ class Searcher:
         self.m.place(x=60, y=13)
 
 
-    def check_thread(self, tkinter, thread):
-        '''Return buttons "ПОИСК", "Выбрать путь" to NORMAL state.'''
-        if thread.is_alive():
-            tkinter.after(100, lambda: self.check_thread(tkinter, thread))
-        else:
-            tkinter.button_search.config(state=NORMAL)
-            tkinter.button_path.config(state=NORMAL)
-
     def btn_search(self, tkinter):
         '''Button 'ПОИСК' logic.'''
         # get path from entry
@@ -89,8 +81,7 @@ class Searcher:
         # disable buttons while searching
         tkinter.button_search.config(state=DISABLED)
         tkinter.button_path.config(state=DISABLED)
-        # check threads are alive or gone
-        self.check_thread(tkinter, thread)
+
         
     def logic(self, tkinter):
         '''Search logic.'''
@@ -180,6 +171,10 @@ class Searcher:
         # wait for threads are gone and films_dict is filled
         for thread in threads:
             thread.join()
+
+        # return buttons "ПОИСК", "Выбрать путь" to NORMAL state
+        tkinter.button_search.config(state=NORMAL)
+        tkinter.button_path.config(state=NORMAL)
 
         # turn on function than create buttons from self.films_dict
         tkinter.make_film_btns()
