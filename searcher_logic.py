@@ -190,14 +190,14 @@ class Searcher:
 
         text_for_area = self.films_dict[key]
 
-        # put the text to text_area
+        # put the text to text area
         if text_for_area is not None:
             tkinter.text_area.delete('1.0', END)
-            tkinter.text_area.insert('1.0', 'Connection error. Проверьте соединение с интернетом!')
+            tkinter.text_area.insert('1.0', text_for_area)
         else:
             # NoneType is when connection error
             tkinter.text_area.delete('1.0', END)
-            tkinter.text_area.insert('1.0', text_for_area)
+            tkinter.text_area.insert('1.0', 'Connection error. Проверьте соединение с интернетом!')
 
         # reset bg color of buttons to default
         btn_index = self.film_list_ready_formated.index(key)
