@@ -4,12 +4,13 @@
 block_cipher = None
 
 added_files = [
-         ( r'C:\Users\SAI\Python_Scr\Kinopoisk\KinoPoiskAPI\searching.ico', '.' )
+         ( r'C:\Users\SAI\Python_Scr\Film-Searcher\searching.ico', '.' )
          ]
+
 a = Analysis(['Film_searcher.py'],
-             pathex=['C:\\Users\\SAI\\Python_Scr\\Kinopoisk\\KinoPoiskAPI'],
+             pathex=['C:\\Users\\SAI\\Python_Scr\\Film-Searcher'],
              binaries=[],
-             datas=added_files,
+             datas=[],
              hiddenimports=[],
              hookspath=[],
              hooksconfig={},
@@ -22,13 +23,15 @@ a = Analysis(['Film_searcher.py'],
 pyz = PYZ(a.pure, a.zipped_data,
              cipher=block_cipher)
 
+a.datas += [('searching.ico', 'C:\\Users\\SAI\\Python_Scr\\Film-Searcher\\searching.ico',  'DATA')]
+
 exe = EXE(pyz,
           a.scripts,
           a.binaries,
           a.zipfiles,
           a.datas,  
           [],
-          name='Film searcher',
+          name='Film_searcher',
           debug=False,
           bootloader_ignore_signals=False,
           strip=False,
@@ -39,4 +42,5 @@ exe = EXE(pyz,
           disable_windowed_traceback=False,
           target_arch=None,
           codesign_identity=None,
-          entitlements_file=None , icon='searching.ico')
+          entitlements_file=None,
+          icon='searching.ico')

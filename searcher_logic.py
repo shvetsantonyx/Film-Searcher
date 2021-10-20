@@ -126,10 +126,10 @@ class Searcher:
             detrans_text = pytils.translit.detranslify(text)
             return detrans_text
 
-        # kinopoisk = KP(token='34c5c2a6-5e2e-4005-aba5-575c848fe1a7')
-        with open('token.txt') as f:
-            TOKEN = f.read().strip()
-        kinopoisk = KP(token=TOKEN)
+        kinopoisk = KP(token='34c5c2a6-5e2e-4005-aba5-575c848fe1a7')
+        # with open('token.txt') as f:
+        #     TOKEN = f.read().strip()
+        # kinopoisk = KP(token=TOKEN)
 
         def searchKP(film):
             '''Working with KinopoiskAPI.'''
